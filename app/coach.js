@@ -91,18 +91,33 @@ $("addClient").onclick = async () => {
   $("addClient").disabled = true;
   $("nc_msg").textContent = "قاعد نعمل الحساب…";
   try {
+    // 1) Create the client's auth account (best-effort). If it already
+    //    exists we ignore that error and just link it in step 2, so the
+    //    flow is idempotent and never leaves an orphaned account.
     const tmp = createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false, storageKey: "ikbel-tmp" },
     });
-    const { data, error } = await tmp.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
-    if (error) throw error;
-    const newId = data.user?.id;
-    if (!newId) throw new Error("الحساب ما تعملش.");
-    const { error: rpcErr } = await sb.rpc("add_my_client", { client: newId });
-    if (rpcErr) throw rpcErr;
+    const { data: su, error: suErr } = await tmp.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
+    const alreadyThere = suErr && /already|registered|exists/i.test(suErr.message);
+    if (suErr && !alreadyThere) throw suErr;
+    const newId = su?.user?.id;
+
+    // 2) Link the account to this coach. Prefer the email-based RPC (also
+    //    recovers orphaned accounts); fall back to the id-based RPC for a
+    //    freshly created account if the email RPC isn't deployed yet.
+    const byEmail = await sb.rpc("add_my_client_by_email", { client_email: email });
+    if (byEmail.error) {
+      if (newId) {
+        const byId = await sb.rpc("add_my_client", { client: newId });
+        if (byId.error) throw byId.error;
+      } else {
+        throw byEmail.error;
+      }
+    }
+
     $("nc_name").value = $("nc_email").value = $("nc_pass").value = "";
     $("nc_msg").textContent = "";
-    toast("الحريف تزاد ✅ ابعثلو الإيميل و كلمة السر.");
+    toast(alreadyThere ? "الحريف تربط معاك ✅" : "الحريف تزاد ✅ ابعثلو الإيميل و كلمة السر.");
     loadClients();
   } catch (e) {
     $("nc_msg").textContent = e.message || "ما نجّمناش نعملو الحريف.";
