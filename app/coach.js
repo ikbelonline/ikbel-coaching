@@ -34,7 +34,7 @@ async function boot() {
 // ---------------- CLIENT LIST ----------------
 let clients = [];
 async function loadClients() {
-  const { data, error } = await sb.from("profiles").select("*").eq("coach_id", me.id).order("full_name");
+  const { data, error } = await sb.from("profiles").select("*").eq("coach_id", me.id).order("created_at", { ascending: false });
   if (error) return toast(error.message, true);
   clients = data || [];
   const list = $("clientList");
