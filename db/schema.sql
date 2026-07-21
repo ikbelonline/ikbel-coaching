@@ -137,14 +137,27 @@ create policy checkins_rw on public.checkins for all
 
 -- ============================================================
 --  AUTO-CREATE a profile row whenever a new user signs up.
---  New users default to role 'client'. You promote yourself to
---  'coach' once, by hand (see SETUP.md step 6).
+--  New users default to role 'client' and are AUTO-ATTACHED to the
+--  coach — so clients can self-register (tap "اعمل حساب") and show up
+--  in the dashboard automatically, no manual entry needed.
+--  You promote yourself to 'coach' once, by hand (see SETUP.md step 6).
 -- ============================================================
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  default_coach uuid;
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, coalesce(new.raw_user_meta_data->>'full_name', new.email))
+  -- pick the coach to own new signups (single-coach setup: the one coach)
+  select id into default_coach
+    from public.profiles
+   where role = 'coach'
+   order by created_at
+   limit 1;
+
+  insert into public.profiles (id, full_name, coach_id)
+  values (new.id,
+          coalesce(new.raw_user_meta_data->>'full_name', new.email),
+          default_coach)
   on conflict (id) do nothing;
   return new;
 end;
