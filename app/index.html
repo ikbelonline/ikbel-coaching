@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e1116" />
+  <title>Ikbel Coaching</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="auth" class="wrap hide">
+  <div style="height: 8vh"></div>
+  <div class="center">
+    <div class="brand" style="justify-content:center; font-size:1.4rem;">
+      <span class="logo">IK</span> Ikbel Coaching
+    </div>
+    <p class="muted">تابع تقدّمك و اوصل لهدفك.</p>
+  </div>
+  <div class="card">
+    <h2 id="authTitle">دخول</h2>
+    <div id="nameField" class="hide">
+      <label>اسمك</label>
+      <input id="fullName" type="text" placeholder="مثلا: أحمد بن علي" autocomplete="name" />
+    </div>
+    <label>الإيميل</label>
+    <input id="email" type="email" placeholder="you@email.com" autocomplete="email" />
+    <label>كلمة السر</label>
+    <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+    <div class="spacer"></div>
+    <button id="authBtn" class="full">دخول</button>
+    <p class="small center muted" style="margin-top:14px">
+      <span id="authSwitchText">حريف جديد؟</span>
+      <a href="#" id="authSwitch" class="link">اعمل حساب</a>
+    </p>
+    <p id="authMsg" class="small center" style="min-height:18px"></p>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="app" class="hide">
+  <div class="topbar">
+    <div class="brand"><span class="logo">IK</span> <span id="hiName">Ikbel Coaching</span></div>
+    <button class="ghost small" id="signout" style="padding:7px 12px">خروج</button>
+  </div>
+
+  <div class="wrap">
+    <!-- ---- TAB: TODAY ---- -->
+    <section id="tab-today" class="tab">
+      <div class="card">
+        <h3>برنامج اليوم</h3>
+        <p class="muted small" id="todayDate"></p>
+        <p>تبعت نظامك الغذائي اليوم؟</p>
+        <div class="row">
+          <button id="adhereYes" class="ghost full">✅ إيه، تبعت</button>
+          <button id="adhereNo" class="ghost full">❌ لا، ما تبعتش</button>
+        </div>
+        <label>ملاحظة (اختياري)</label>
+        <input id="adhereNote" type="text" placeholder="مثلا: فوّتت وجبة، كليت برّا..." />
+      </div>
+
+      <div class="card">
+        <h3>سجّل الوزن و القياسات</h3>
+        <div class="grid2">
+          <div><label>الوزن (كغ)</label><input id="w_weight" type="number" step="0.1" inputmode="decimal" /></div>
+          <div><label>الخصر (صم)</label><input id="w_waist" type="number" step="0.1" inputmode="decimal" /></div>
+          <div><label>الوَرك (صم)</label><input id="w_hips" type="number" step="0.1" inputmode="decimal" /></div>
+          <div><label>الصدر (صم)</label><input id="w_chest" type="number" step="0.1" inputmode="decimal" /></div>
+          <div><label>الذراع (صم)</label><input id="w_arm" type="number" step="0.1" inputmode="decimal" /></div>
+          <div><label>الفخذ (صم)</label><input id="w_thigh" type="number" step="0.1" inputmode="decimal" /></div>
+        </div>
+        <div class="spacer"></div>
+        <button id="saveWeight" class="full">احفظ أرقام اليوم</button>
+      </div>
+    </section>
+
+    <!-- ---- TAB: FOOD LOG ---- -->
+    <section id="tab-food" class="tab hide">
+      <div class="card">
+        <h3>زيد وجبة</h3>
+        <label>نوع الوجبة</label>
+        <select id="m_type">
+          <option value="breakfast">🌅 فطور الصباح</option>
+          <option value="lunch">🍽️ غداء</option>
+          <option value="dinner">🌙 عشاء</option>
+          <option value="snack">🍎 قهوة / سناك</option>
+        </select>
+        <label>شنوّة كليت؟</label>
+        <textarea id="m_desc" placeholder="مثلا: 2 بيض، خبز شعير، طماطم و زيت زيتون..."></textarea>
+        <div class="row">
+          <div><label>السعرات (اختياري)</label><input id="m_cal" type="number" inputmode="numeric" placeholder="كيلوكالوري" /></div>
+          <div>
+            <label>تصويرة الماكلة (اختياري)</label>
+            <label class="btn ghost full" style="cursor:pointer">📷 زيد تصويرة<input id="m_photo" type="file" accept="image/*" capture="environment" hidden></label>
+          </div>
+        </div>
+        <p id="m_photoName" class="small muted"></p>
+        <div class="spacer"></div>
+        <button id="saveMeal" class="full">زيد الوجبة</button>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <h3 style="margin:0">وجبات اليوم</h3>
+          <span class="pill" id="m_totalCal">0 كالوري</span>
+        </div>
+        <div id="mealList" style="margin-top:12px"></div>
+        <p id="noMeals" class="muted small center hide">مازال ما زدت حتّى وجبة اليوم.</p>
+      </div>
+    </section>
+
+    <!-- ---- TAB: PHOTOS ---- -->
+    <section id="tab-photos" class="tab hide">
+      <div class="card">
+        <h3>صور التقدّم</h3>
+        <p class="muted small">نفس الضوء و نفس الوضعية كل جمعة تعطيك مقارنة أوضح.</p>
+        <div class="row">
+          <label class="btn ghost full" style="cursor:pointer">📷 قدّام<input data-pose="front" class="photoInput" type="file" accept="image/*" capture="environment" hidden></label>
+          <label class="btn ghost full" style="cursor:pointer">📷 جنب<input data-pose="side" class="photoInput" type="file" accept="image/*" capture="environment" hidden></label>
+          <label class="btn ghost full" style="cursor:pointer">📷 ورا<input data-pose="back" class="photoInput" type="file" accept="image/*" capture="environment" hidden></label>
+        </div>
+        <p id="photoMsg" class="small center muted"></p>
+      </div>
+      <div class="card">
+        <h3>آخر الصور</h3>
+        <div id="photoGrid" class="photo-grid"></div>
+        <p id="noPhotos" class="muted small center hide">ما فماش صور توّا.</p>
+      </div>
+    </section>
+
+    <!-- ---- TAB: CHECK-IN ---- -->
+    <section id="tab-checkin" class="tab hide">
+      <div class="card">
+        <h3>متابعة الجمعة</h3>
+        <p class="muted small" id="weekLabel"></p>
+        <label>النوم <span class="muted" id="v_sleep">3</span>/5</label>
+        <input id="c_sleep" type="range" min="1" max="5" value="3" />
+        <label>الطاقة <span class="muted" id="v_energy">3</span>/5</label>
+        <input id="c_energy" type="range" min="1" max="5" value="3" />
+        <label>الجوع <span class="muted" id="v_hunger">3</span>/5</label>
+        <input id="c_hunger" type="range" min="1" max="5" value="3" />
+        <label>المزاج <span class="muted" id="v_mood">3</span>/5</label>
+        <input id="c_mood" type="range" min="1" max="5" value="3" />
+        <label>كيفاش كانت جمعتك؟</label>
+        <textarea id="c_notes" placeholder="الإنجازات، الصعوبات، أسئلة للكوتش..."></textarea>
+        <div class="spacer"></div>
+        <button id="saveCheckin" class="full">ابعث المتابعة</button>
+      </div>
+      <div id="feedbackCard" class="card hide">
+        <h3>💬 ملاحظات الكوتش</h3>
+        <p id="coachFeedback"></p>
+      </div>
+    </section>
+
+    <!-- ---- TAB: PROGRESS ---- -->
+    <section id="tab-progress" class="tab hide">
+      <div class="card">
+        <div class="stats">
+          <div class="stat"><div class="n" id="s_weight">–</div><div class="l">آخر وزن</div></div>
+          <div class="stat"><div class="n" id="s_change">–</div><div class="l">التغيير</div></div>
+          <div class="stat"><div class="n" id="s_streak">0</div><div class="l">أيام متتالية</div></div>
+          <div class="stat"><div class="n" id="s_compliance">–</div><div class="l">الالتزام (30 يوم)</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>تطوّر الوزن</h3>
+        <div id="weightBars" class="bars"></div>
+        <p id="noWeight" class="muted small center hide">سجّل وزنك باش تشوف التطوّر.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- bottom nav -->
+  <nav class="tabbar">
+    <button data-tab="today" class="active"><span class="ico">📋</span>اليوم</button>
+    <button data-tab="food"><span class="ico">🍽️</span>الماكلة</button>
+    <button data-tab="photos"><span class="ico">📷</span>الصور</button>
+    <button data-tab="checkin"><span class="ico">📝</span>المتابعة</button>
+    <button data-tab="progress"><span class="ico">📈</span>التقدّم</button>
+  </nav>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module" src="client.js"></script>
+</body>
+</html>

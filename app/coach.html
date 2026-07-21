@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e1116" />
+  <title>Ikbel Coaching — الكوتش</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="logo">IK</span> لوحة الكوتش</div>
+  <button class="ghost small" id="signout" style="padding:7px 12px">خروج</button>
+</div>
+
+<div class="wrap wide">
+  <!-- gate shown if a non-coach lands here -->
+  <div id="gate" class="card hide center">
+    <h3>خاص بالكوتش برك</h3>
+    <p class="muted">الحساب هذا مازال موش مسجّل ككوتش.</p>
+  </div>
+
+  <!-- CLIENT LIST -->
+  <section id="listView">
+    <div class="card">
+      <div class="stats">
+        <div class="stat"><div class="n" id="k_clients">0</div><div class="l">الحرفاء النشطين</div></div>
+        <div class="stat"><div class="n" id="k_checkins">0</div><div class="l">متابعات هالجمعة</div></div>
+        <div class="stat"><div class="n" id="k_stale">0</div><div class="l">ساكتين 7 أيام+</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>زيد حريف</h3>
+      <p class="muted small">اعمل حساب الحريف، ابعثلو الإيميل و كلمة السر، و باش يظهرلك هوني.</p>
+      <div class="row">
+        <input id="nc_name" placeholder="اسم الحريف" />
+        <input id="nc_email" type="email" placeholder="client@email.com" />
+      </div>
+      <label>كلمة سر مؤقتة</label>
+      <input id="nc_pass" placeholder="6 حروف عالأقل" />
+      <div class="spacer"></div>
+      <button id="addClient" class="full">اعمل الحريف</button>
+      <p id="nc_msg" class="small center"></p>
+    </div>
+
+    <div class="card">
+      <h3>الحرفاء متاعك</h3>
+      <div id="clientList"></div>
+      <p id="noClients" class="muted small center hide">ما فماش حرفاء توّا. زيد واحد لفوق.</p>
+    </div>
+  </section>
+
+  <!-- CLIENT DETAIL -->
+  <section id="detailView" class="hide">
+    <button class="ghost small" id="back" style="margin:6px 0">→ الحرفاء الكل</button>
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:12px">
+        <div class="avatar" id="d_avatar">–</div>
+        <div>
+          <h2 style="margin:0" id="d_name">حريف</h2>
+          <p class="muted small" style="margin:2px 0" id="d_goal"></p>
+        </div>
+      </div>
+      <div class="stats" style="margin-top:14px">
+        <div class="stat"><div class="n" id="d_weight">–</div><div class="l">آخر وزن</div></div>
+        <div class="stat"><div class="n" id="d_change">–</div><div class="l">التغيير</div></div>
+        <div class="stat"><div class="n" id="d_streak">0</div><div class="l">أيام متتالية</div></div>
+        <div class="stat"><div class="n" id="d_compliance">–</div><div class="l">الالتزام (30 يوم)</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>تطوّر الوزن</h3>
+      <div id="d_bars" class="bars"></div>
+      <p id="d_noWeight" class="muted small center hide">مازال ما فماش وزن مسجّل.</p>
+    </div>
+
+    <div class="card">
+      <h3>🍽️ آخر الوجبات</h3>
+      <div id="d_meals"></div>
+      <p id="d_noMeals" class="muted small center hide">مازال ما سجّل حتّى وجبة.</p>
+    </div>
+
+    <div class="card">
+      <h3>آخر متابعة</h3>
+      <div id="d_checkin"><p class="muted small">مازال ما فماش متابعة.</p></div>
+      <label>ملاحظاتك للحريف</label>
+      <textarea id="d_feedback" placeholder="اكتب ملاحظات باش يشوفها الحريف في الأبليكاسيون..."></textarea>
+      <div class="spacer"></div>
+      <button id="d_saveFeedback">ابعث الملاحظات</button>
+    </div>
+
+    <div class="card">
+      <h3>صور التقدّم</h3>
+      <div id="d_photos" class="photo-grid"></div>
+      <p id="d_noPhotos" class="muted small center hide">مازال ما فماش صور.</p>
+    </div>
+  </section>
+</div>
+
+<div id="toast" class="toast"></div>
+<script type="module" src="coach.js"></script>
+</body>
+</html>
