@@ -135,11 +135,22 @@ async function openClient(c) {
   $("d_goal").textContent = c.goal ? "🎯 " + c.goal : "";
   $("d_avatar").textContent = (c.full_name || "?").split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
 
-  // weight
-  const { data: weights } = await sb.from("weigh_ins").select("date,weight_kg").eq("client_id", c.id)
-    .not("weight_kg", "is", null).order("date", { ascending: true });
+  // meta: start date + days as client
+  if (c.start_date) {
+    const days = Math.max(0, Math.floor((Date.now() - new Date(c.start_date)) / 86400000));
+    $("d_meta").textContent = "📅 بدا " + fmtDate(c.start_date) + " · " + days + " يوم معاك";
+  } else {
+    $("d_meta").textContent = "";
+  }
+
+  // weigh-ins: full rows (weight + all body measurements)
+  const { data: rows } = await sb.from("weigh_ins").select("*").eq("client_id", c.id).order("date", { ascending: true });
+  const allRows = rows || [];
+
+  // weight chart
+  const weights = allRows.filter((w) => w.weight_kg != null);
   const bars = $("d_bars"); bars.innerHTML = "";
-  if (weights && weights.length) {
+  if (weights.length) {
     $("d_noWeight").classList.add("hide");
     const vals = weights.map((w) => w.weight_kg);
     const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1;
@@ -157,6 +168,26 @@ async function openClient(c) {
     $("d_noWeight").classList.remove("hide");
     $("d_weight").textContent = "–"; $("d_change").textContent = "–";
   }
+
+  // body measurements: latest value + change since first
+  const MEAS = [["waist_cm","الخصر"],["hips_cm","الوَرك"],["chest_cm","الصدر"],["arm_cm","الذراع"],["thigh_cm","الفخذ"]];
+  const measBox = $("d_measures"); measBox.innerHTML = "";
+  let anyMeas = false;
+  for (const [key, label] of MEAS) {
+    const series = allRows.filter((r) => r[key] != null);
+    if (!series.length) continue;
+    anyMeas = true;
+    const latest = series[series.length - 1][key];
+    const diff = latest - series[0][key];
+    const chg = series.length > 1 ? (diff > 0 ? "+" : "") + (+diff.toFixed(1)) : "";
+    const col = diff <= 0 ? "var(--brand)" : "var(--amber)";
+    const tile = document.createElement("div");
+    tile.className = "stat";
+    tile.innerHTML = `<div class="n">${latest}<span style="font-size:.62em;font-weight:600"> صم</span></div>
+      <div class="l">${label}${chg ? ` <span style="color:${col};font-weight:700">${chg}</span>` : ""}</div>`;
+    measBox.appendChild(tile);
+  }
+  $("d_noMeasures").classList.toggle("hide", anyMeas);
 
   // adherence
   const { data: adh } = await sb.from("adherence").select("date,hit_plan").eq("client_id", c.id).order("date", { ascending: false }).limit(60);
@@ -189,8 +220,9 @@ async function openClient(c) {
     mbox.appendChild(el);
   }
 
-  // latest check-in
-  const { data: ci } = await sb.from("checkins").select("*").eq("client_id", c.id).order("week_start", { ascending: false }).limit(1).maybeSingle();
+  // check-ins: latest (for feedback) + full history
+  const { data: cis } = await sb.from("checkins").select("*").eq("client_id", c.id).order("week_start", { ascending: false }).limit(12);
+  const ci = cis && cis[0];
   const box = $("d_checkin");
   if (ci) {
     box.innerHTML = `<p class="muted small">جمعة ${fmtDate(ci.week_start)}</p>
@@ -207,6 +239,21 @@ async function openClient(c) {
     box.innerHTML = `<p class="muted small">مازال ما فماش متابعة.</p>`;
     $("d_feedback").value = "";
     $("d_saveFeedback").onclick = () => toast("مازال ما فماش متابعة باش تزيد عليها ملاحظات.", true);
+  }
+
+  // check-in history
+  const hist = $("d_checkinHistory"); hist.innerHTML = "";
+  $("d_noCheckins").classList.toggle("hide", !!(cis && cis.length));
+  for (const k of cis || []) {
+    const fb = k.coach_feedback ? `<span class="pill good">فيها ملاحظات</span>` : `<span class="pill warn">بلا ملاحظات</span>`;
+    const row = document.createElement("div");
+    row.style.cssText = "padding:11px 0;border-bottom:1px solid var(--border)";
+    row.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <strong class="small">جمعة ${fmtDate(k.week_start)}</strong>${fb}
+      </div>
+      <div class="small muted" style="margin-top:5px">😴 ${k.sleep ?? "–"} · ⚡ ${k.energy ?? "–"} · 🍽️ ${k.hunger ?? "–"} · 🙂 ${k.mood ?? "–"}</div>
+      ${k.notes ? `<div class="small" style="margin-top:5px">📝 ${esc(k.notes)}</div>` : ""}`;
+    hist.appendChild(row);
   }
 
   // photos
