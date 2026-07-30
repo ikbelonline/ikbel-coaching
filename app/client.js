@@ -1,5 +1,6 @@
 // Ikbel Coaching — client (member) app logic  [Tunsi UI]
 import { sb, myProfile, signOut, todayISO, weekStartISO, fmtDate, esc } from "./db.js";
+import { FOODS } from "./foods.js";
 
 const $ = (id) => document.getElementById(id);
 let profile = null;
@@ -193,6 +194,90 @@ $("saveMeal").onclick = async () => {
   } finally {
     $("saveMeal").disabled = false;
   }
+};
+
+// ---------------- CALORIE CALCULATOR ----------------
+// Normalise Arabic so search ignores harakat and alef/ya/ta-marbuta variants.
+const normAr = (s) => String(s || "")
+  .replace(/[ً-ْ]/g, "")
+  .replace(/[أإآ]/g, "ا")
+  .replace(/ى/g, "ي")
+  .replace(/ة/g, "ه")
+  .replace(/\s+/g, " ")
+  .trim().toLowerCase();
+
+let basket = []; // [{ food, qty }]
+
+function renderFoodResults(q) {
+  const box = $("foodResults");
+  box.innerHTML = "";
+  const nq = normAr(q);
+  if (!nq) return;
+  const matches = FOODS.filter((f) => normAr(f.n).includes(nq)).slice(0, 8);
+  if (!matches.length) {
+    box.innerHTML = `<p class="small muted" style="margin:8px 2px">ما لقيناش الماكلة... أكتب الكالوري يدويًا تحت.</p>`;
+    return;
+  }
+  for (const f of matches) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "food-chip";
+    b.innerHTML = `<span>${esc(f.n)}</span><em>${f.c} ك · ${esc(f.u)}</em>`;
+    b.onclick = () => { addToBasket(f); $("foodSearch").value = ""; renderFoodResults(""); $("foodSearch").focus(); };
+    box.appendChild(b);
+  }
+}
+
+function addToBasket(food) {
+  const ex = basket.find((x) => x.food.n === food.n);
+  if (ex) ex.qty += 1; else basket.push({ food, qty: 1 });
+  renderBasket();
+}
+
+function renderBasket() {
+  const box = $("foodBasket");
+  box.innerHTML = "";
+  let total = 0;
+  for (const item of basket) {
+    total += item.food.c * item.qty;
+    const row = document.createElement("div");
+    row.className = "basket-row";
+    row.innerHTML = `
+      <button type="button" class="basket-x" aria-label="نحّي">×</button>
+      <div class="basket-info">
+        <div>${esc(item.food.n)}</div>
+        <div class="small muted">${item.food.c * item.qty} كالوري</div>
+      </div>
+      <div class="qty">
+        <button type="button" class="qminus">−</button>
+        <span>${item.qty}</span>
+        <button type="button" class="qplus">+</button>
+      </div>`;
+    row.querySelector(".qplus").onclick = () => { item.qty += 1; renderBasket(); };
+    row.querySelector(".qminus").onclick = () => { item.qty -= 1; if (item.qty <= 0) basket = basket.filter((x) => x !== item); renderBasket(); };
+    row.querySelector(".basket-x").onclick = () => { basket = basket.filter((x) => x !== item); renderBasket(); };
+    box.appendChild(row);
+  }
+  $("calcTotal").textContent = total;
+  const has = basket.length > 0;
+  $("calcTotalRow").classList.toggle("hide", !has);
+  $("useCalc").classList.toggle("hide", !has);
+}
+
+$("foodSearch").oninput = () => renderFoodResults($("foodSearch").value);
+
+$("useCalc").onclick = () => {
+  const total = basket.reduce((s, x) => s + x.food.c * x.qty, 0);
+  $("m_cal").value = total;
+  const names = basket.map((x) => (x.qty > 1 ? `${x.food.n} ×${x.qty}` : x.food.n)).join("، ");
+  const cur = $("m_desc").value.trim();
+  $("m_desc").value = cur ? cur + "، " + names : names;
+  basket = [];
+  renderBasket();
+  $("foodSearch").value = "";
+  renderFoodResults("");
+  toast("تحسبت الكالوري ✅");
+  $("m_desc").scrollIntoView({ behavior: "smooth", block: "center" });
 };
 
 async function loadMeals() {

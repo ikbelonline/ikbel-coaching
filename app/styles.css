@@ -241,6 +241,47 @@ input[type="range"]::-moz-range-thumb {
 .photo-grid img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); }
 .photo-tag { font-size: 0.7rem; color: var(--muted); text-align: center; margin-top: 4px; font-weight: 600; }
 
+/* ------------------------------ calorie calculator ---------------------- */
+.food-results { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+.food-chip {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; padding: 11px 14px; text-align: inherit;
+  background: var(--surface-2); color: var(--text); font-weight: 600;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  box-shadow: none; letter-spacing: normal;
+}
+.food-chip:hover { background: var(--surface-3); transform: none; }
+.food-chip em { font-style: normal; font-size: 0.8rem; color: var(--brand-2); font-weight: 700; white-space: nowrap; }
+
+.food-basket { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.basket-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface-2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm); padding: 8px 10px;
+}
+.basket-info { flex: 1; min-width: 0; }
+.basket-info > div:first-child { font-weight: 600; }
+.basket-x {
+  flex: none; width: 26px; height: 26px; padding: 0; border-radius: 8px;
+  background: rgba(244, 63, 94, 0.14); color: #fb7185; font-size: 1.1rem; font-weight: 700;
+  box-shadow: none;
+}
+.basket-x:hover { background: rgba(244, 63, 94, 0.24); transform: none; }
+.qty { display: flex; align-items: center; gap: 8px; flex: none; }
+.qty span { min-width: 18px; text-align: center; font-weight: 800; }
+.qty button {
+  width: 30px; height: 30px; padding: 0; border-radius: 9px; font-size: 1.2rem; font-weight: 800;
+  background: var(--surface-3); color: var(--text); border: 1px solid var(--border); box-shadow: none;
+}
+.qty button:hover { background: var(--brand); color: var(--brand-ink); border-color: transparent; transform: none; }
+
+.calc-total {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 14px; padding: 12px 15px; border-radius: var(--radius-sm);
+  background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.calc-total strong { font-size: 1.15rem; color: var(--brand-2); }
+
 .hide { display: none !important; }
 .center { text-align: center; }
 .spacer { height: 10px; }

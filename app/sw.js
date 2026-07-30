@@ -1,9 +1,9 @@
 // Ikbel Coaching — minimal service worker (enables "install to home screen"
 // and offline shell caching). Network-first so app updates are picked up.
-const CACHE = "ikbel-v1";
+const CACHE = "ikbel-v2";
 const SHELL = [
   "index.html", "coach.html", "styles.css",
-  "db.js", "client.js", "coach.js", "config.js",
+  "db.js", "client.js", "coach.js", "config.js", "foods.js",
   "manifest.webmanifest",
 ];
 

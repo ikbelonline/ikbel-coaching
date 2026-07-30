@@ -82,6 +82,19 @@
     <!-- ---- TAB: FOOD LOG ---- -->
     <section id="tab-food" class="tab hide">
       <div class="card">
+        <h3>🔢 حاسبة الكالوري</h3>
+        <p class="muted small">لقّي الماكلة، زيدها، و الكالوري يتحسب وحدو. من بعد اضغط "استعمل".</p>
+        <input id="foodSearch" type="text" autocomplete="off" placeholder="لقّي: كسكسي، بريك، بيضة، موز..." />
+        <div id="foodResults" class="food-results"></div>
+        <div id="foodBasket" class="food-basket"></div>
+        <div id="calcTotalRow" class="calc-total hide">
+          <span>المجموع</span>
+          <strong><span id="calcTotal">0</span> كالوري</strong>
+        </div>
+        <button id="useCalc" class="full hide" style="margin-top:12px">استعمل هالكالوري في الوجبة ✅</button>
+      </div>
+
+      <div class="card">
         <h3>زيد وجبة</h3>
         <label>نوع الوجبة</label>
         <select id="m_type">
