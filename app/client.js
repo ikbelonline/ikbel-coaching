@@ -38,6 +38,11 @@ $("authBtn").onclick = async () => {
   const email = $("email").value.trim();
   const password = $("password").value;
   if (!email || !password) return ($("authMsg").textContent = "دخّل الإيميل و كلمة السر.");
+  if (mode === "signup") {
+    if (!$("fullName").value.trim()) return ($("authMsg").textContent = "اكتب اسمك.");
+    if ($("signupPhone").value.replace(/\D/g, "").length < 8)
+      return ($("authMsg").textContent = "دخّل رقم واتساب صحيح (8 أرقام عالأقل).");
+  }
   $("authBtn").disabled = true;
   $("authMsg").textContent = "استنّى شويّة…";
   try {
