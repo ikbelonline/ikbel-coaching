@@ -43,11 +43,15 @@ $("authBtn").onclick = async () => {
   try {
     if (mode === "signup") {
       const full_name = $("fullName").value.trim();
+      const phone = $("signupPhone").value.trim();
       const { error } = await sb.auth.signUp({
         email, password, options: { data: { full_name } },
       });
       if (error) throw error;
       const { data: sess } = await sb.auth.getSession();
+      if (sess.session && phone) {
+        await sb.from("profiles").update({ phone }).eq("id", sess.session.user.id);
+      }
       if (!sess.session) {
         mode = "signin"; renderAuthMode();
         $("authMsg").textContent = "الحساب تعمل — تنجّم تدخل توّا.";
@@ -87,6 +91,7 @@ async function boot() {
   $("app").classList.remove("hide");
   const first = (profile?.full_name || "بيك").split(" ")[0];
   $("hiName").textContent = "أهلا " + first;
+  $("myPhone").value = profile?.phone || "";
   $("todayDate").textContent = new Date().toLocaleDateString("ar-TN", { weekday: "long", day: "numeric", month: "long" });
   $("weekLabel").textContent = "جمعة " + fmtDate(weekStartISO());
 
@@ -155,6 +160,17 @@ $("saveWeight").onclick = async () => {
   toast("تسجّل 📊");
   ["w_weight","w_waist","w_hips","w_chest","w_arm","w_thigh"].forEach((id) => ($(id).value = ""));
   loadToday(); loadProgress();
+};
+
+// ---------------- WHATSAPP NUMBER ----------------
+$("savePhone").onclick = async () => {
+  const phone = $("myPhone").value.trim();
+  $("savePhone").disabled = true;
+  const { error } = await sb.from("profiles").update({ phone: phone || null }).eq("id", profile.id);
+  $("savePhone").disabled = false;
+  if (error) return toast(error.message, true);
+  profile.phone = phone || null;
+  toast("الرقم تسجّل 📱");
 };
 
 // ---------------- FOOD LOG ----------------

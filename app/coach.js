@@ -135,6 +135,19 @@ async function openClient(c) {
   $("d_goal").textContent = c.goal ? "🎯 " + c.goal : "";
   $("d_avatar").textContent = (c.full_name || "?").split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
 
+  // WhatsApp click-to-chat (normalise: default Tunisia +216 for 8-digit numbers)
+  const wa = $("d_whatsapp");
+  if (c.phone && c.phone.replace(/\D/g, "").length >= 8) {
+    const digits = c.phone.replace(/\D/g, "");
+    const intl = digits.length === 8 ? "216" + digits : digits;
+    const msg = "أهلا " + (c.full_name || "") + " 👋";
+    wa.href = `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
+    wa.textContent = "📱 واتساب " + c.phone;
+    wa.classList.remove("hide");
+  } else {
+    wa.classList.add("hide");
+  }
+
   // meta: start date + days as client
   if (c.start_date) {
     const days = Math.max(0, Math.floor((Date.now() - new Date(c.start_date)) / 86400000));
